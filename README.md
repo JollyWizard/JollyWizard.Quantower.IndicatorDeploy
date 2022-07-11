@@ -1,0 +1,19 @@
+# JollyWizard.Quantower.IndicatorDeploy
+A project to help deploy indicator projects for the Quantower platform.
+
+## Overview
+
+This project builds an installer system for Quantower Indicator Projects.
+
+As a dependency it enables build tasks:
+
+* Automatically detect running Quantower instances and include their assemblies as references.
+* This prevents hardcoding local paths into repository like Quantower Algo.
+* Automatically deploy builds to the current Quantower instance.
+* Package Builds with the installer for distribution.
+
+## Usage
+
+Documentation will be updated when the uploading of sibling projects is complete.
+
+Currently requires that either Quantower to be running or that the `QuantowerRoot` environment variable is set to Quantower folder with `Start.lnk`.

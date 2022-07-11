@@ -1,0 +1,80 @@
+﻿<Project Sdk="Microsoft.NET.Sdk" DefaultTargets="Build;Publish;Pack">
+
+  <PropertyGroup Label="Meta">
+    <Authors>James Arlow</Authors>
+    <Company>Jolly Wizard</Company>
+    <Description>An MSbuild dependency to wire up Quantower Indicator projects and package the output with an installer.</Description>
+    <Copyright>Public Domain</Copyright>
+    <Version>1.0.0</Version>
+  </PropertyGroup>
+  
+  <PropertyGroup Label="Compiler Options">
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+  
+  <PropertyGroup Label="Build/Publish Config">    
+    <Configuration>Release</Configuration>
+    <OutputType>exe</OutputType>
+    <TargetFramework>net48</TargetFramework>    
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+
+    <PublishProtocol>FileSystem</PublishProtocol>
+    <DeleteExistingFiles>True</DeleteExistingFiles>
+    <PublishDir>.\dist</PublishDir>
+    
+    <!--Note: Not sure when applicable (net48|net6.0).-->
+    <Platform>Any CPU</Platform>
+    <PlatformTarget>anycpu</PlatformTarget>
+    <SelfContained>true</SelfContained>
+  
+    <!--Note: Will disable debugging. -->
+    <PublishSingleFile Condition="'$(TargetFramework)' == 'net6.0'">true</PublishSingleFile>
+  </PropertyGroup>
+
+  <Choose>
+    <!-- Prevent errors and questionable output in VS. -->
+    <When Condition=" '$(Configuration)' == 'Debug' ">
+      <PropertyGroup>
+        <!-- Disable pack and publish in `Debug` to ensure only proper artifacts are produced. -->
+        <!-- Disabling publishing also prevents single file packaging, which re-allows live debug. (`net6.0` only) -->
+        <IsPublishable>false</IsPublishable>
+        <IsPackable>false</IsPackable>
+      </PropertyGroup>
+    </When>
+    <Otherwise>
+      <PropertyGroup>
+        <!-- This will turn off symbols file (`.pdb`) in release build.-->
+        <DebugType>None</DebugType>
+      </PropertyGroup>
+    </Otherwise>
+  </Choose>
+
+  <ItemGroup Label="Dependencies">
+    <PackageReference Include="JollyWizard.Quantower.Setup" Version="1.0.0" />
+    <PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="6.0.0" />
+
+    <Reference Condition="('$(TargetFramework.contains(`net4`))' and '$(LangVersion)'=='latest')" Include="System.Net.Http" Label="Required by newer lang standards with ImplicitUsings." />
+  </ItemGroup>
+
+  <ItemGroup Label="Content Mappings">
+    <Content Include="resources\**" CopyToOutputDirectory="Never" Pack="true" Label="Static `resources` content."/>
+    <Content Include="dist\**"  CopyToOutputDirectory="Never" Pack="true" PackagePath="content\resources\indicator-installer\net48\" Label="Mapped `resources` content."/>
+    <Folder Include="dist\" Label="Prevent VS Studio from deleting the previous mapping."/>
+  </ItemGroup>
+ 
+  <ItemGroup Label="Build Target Mappings">
+    <None Include="build\**" Pack="true" PackagePath="build\" />
+  </ItemGroup>
+
+  <Target Name="ExtraClean" AfterTargets="Clean">
+    <RemoveDir Directories="dist\;resources\indicator-installer;" /> 
+  </Target>
+  
+  <Target Name="NugetLocal" AfterTargets="Pack">
+    <!-- This can't be a publish target because Project $(OutputType) is `.exe`." -->
+    <Copy SourceFiles="bin\Release\$(AssemblyName).$(Version).nupkg" DestinationFolder="..\.nuget-local" />
+  </Target>
+
+</Project>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+
+	<PropertyGroup>
+		<!-- 
+		This section builds variables for use in other tasks commands.
+		
+		@requires $(QuantowerRoot) | must exist as an environment variable or declared property.
+		-->
+		
+		<!-- API library paths -->
+		<QuantowerPlatforms>$(QuantowerRoot)\TradingPlatform\*</QuantowerPlatforms>
+		<QuantowerBins>$(QuantowerPlatforms)\bin</QuantowerBins>
+		
+		<!-- Custom indicator paths -->
+		<QuantowerUserIndicatorsRoot>$(QuantowerRoot)\Settings\Scripts\Indicators</QuantowerUserIndicatorsRoot>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!--
+		This section attaches the API for whatever version is located inside the quantower root.
+		The way quantower manages versions, it should only ever match to the currently active version.
+		-->
+		<Reference Include="$(QuantowerBins)\TradingPlatform.BusinessLayer.dll">
+			<Private>false</Private>
+			<!-- false = do not copy to output. -->
+		</Reference>
+	</ItemGroup>
+</Project>

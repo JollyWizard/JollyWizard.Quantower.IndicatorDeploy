@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <PropertyGroup>
+    <!-- This is a reference to the unpacked content directory for this package. -->
+    <IndicatorDeploy>$(MSBuildThisFileDirectory)\..\..\</IndicatorDeploy>
+  </PropertyGroup>
+
+  <Choose>
+    <When Condition="'$(Configuration)'!='Debug'">
+      <ItemGroup>
+        <Content Remove="$(IndicatorDeploy)\**"/>
+      </ItemGroup>
+    </When>
+  </Choose>
+
+  <Import Project=".\QuantowerHelpers\IndicatorBuild.proj"/>
+</Project>

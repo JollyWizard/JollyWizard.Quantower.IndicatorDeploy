@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+
+  <PropertyGroup>
+    <QuantowerIndicatorGroup Condition="'$(QuantowerIndicatorGroup)'==''">$(AssemblyName)</QuantowerIndicatorGroup>
+    <QuantowerIndicatorInstallTarget>$(QuantowerUserIndicatorsRoot)\$(QuantowerIndicatorGroup)</QuantowerIndicatorInstallTarget>
+  </PropertyGroup>
+
+  <Choose>
+    <When Condition="'$(Indicator_Defaults)'=='true'">
+      <PropertyGroup>
+        <Indicator_IncludeInstaller>true</Indicator_IncludeInstaller>
+        <Indicator_AfterBuild_Install>true</Indicator_AfterBuild_Install>
+        <Indicator_AfterBuild_Package>true</Indicator_AfterBuild_Package>
+      </PropertyGroup>
+    </When>
+  </Choose>
+
+  <Target Name="Indicator-Install" AfterTargets="AfterBuild;AfterRebuild" Condition="'$(Indicator_AfterBuild_Install)'=='true'">
+    <!-- 
+    This section copys the files into that Quantower custom indicator folder. 
+    -->
+    <ItemGroup>
+      <FilesToCopy Include="$(OutputPath)/**" />
+      <CopyDest Include="$(QuantowerIndicatorInstallTarget)" />
+    </ItemGroup>
+    <Message Importance="high" Text="[=] Installing Indicator..."/>
+    <Message Importance="high" Text="  Indicator Files To Copy: @(FilesToCopy)" />
+    <Message Importance="high" Text="  Indicator Target Directory: @(CopyDest)" />
+    <Copy SourceFiles="@(FilesToCopy)"  DestinationFolder="@(CopyDest)" />
+  </Target>
+
+  <Target Name="Indicator-Build-Dist" AfterTargets="AfterBuild;AfterRebuild" Condition="'$(Indicator_AfterBuild_Package)'=='true'" >
+    <!-- 
+    This section builds a zip file that can be unzipped to install the indicator manually. 
+    -->
+    <PropertyGroup>
+      <OutputFilename>$(MSBuildProjectName).zip</OutputFilename>
+
+      <OutputFolder>$(MSBuildProjectDirectory)\dist\</OutputFolder>
+      <OutputFilePath>$(OutputFolder)\$(OutputFileName)</OutputFilePath>
+
+      <TempFolder>$(MSBuildProjectDirectory)\dist-temp\</TempFolder>
+      <TempOutputSlug>$(QuantowerIndicatorGroup)</TempOutputSlug>
+      <TempOutputFolder>$(TempFolder)\$(TempOutputSlug)</TempOutputFolder>
+    </PropertyGroup>
+    <ItemGroup>
+      <InputDirectory Include="$(OutputPath)\" />
+      <InputFiles Include="$(OutputPath)\**" />
+    </ItemGroup>
+    <Message Importance="high" Text="[=] Packaging Indicator..."/>
+    <Message Importance="high" Text="  Directory To Include: @(InputDirectory)" />
+    <Message Importance="high" Text="  Target Output File: @(OutputFilePath)" />
+    <MakeDir Directories="$(OutputFolder);$(TempFolder)" />
+    <Copy SourceFiles="@(InputFiles)" DestinationFolder="$(TempOutputFolder)" />
+    <ZipDirectory Overwrite="true" SourceDirectory="$(TempFolder)" DestinationFile="$(OutputFilePath)" />
+    <RemoveDir Directories="$(TempFolder)" />
+  </Target>
+
+  <Target Name="Indicator-IncludeInstaller" AfterTargets="Build;Rebuild" Condition="'$(Indicator_IncludeInstaller)'=='true'">
+    <!--
+    This copies all of the installer resources
+    -->
+    <PropertyGroup>
+      <IndicatorDeploymentPath>$(IndicatorDeploy)\content\resources\indicator-installer\net48\**</IndicatorDeploymentPath>
+    </PropertyGroup>
+    <ItemGroup Label="The list of files to unpack to put the installer in the output.">
+      <!-- Then reference the files via their relative location. -->
+      <IndicatorDeploymentFiles Include="$(IndicatorDeploymentPath)" />
+    </ItemGroup>
+    <Message Importance="high" Text="[=] Adding Installer..."/>
+    <Message Importance="high" Text="  Installer Resources (Path): $(IndicatorDeploymentPath)"  />
+    <Message Importance="high" Text="  Installer Resources: @(IndicatorDeploymentFiles)"  />
+    <Message Importance="high" Text="  Installer Destination Folder: $(OutputPath)"  />
+    <Copy SourceFiles="@(IndicatorDeploymentFiles)" DestinationFolder="$(OutputPath)" />
+  </Target>
+
+</Project>
