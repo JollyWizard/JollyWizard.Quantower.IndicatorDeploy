@@ -20,4 +20,4 @@ Main documentation will be updated when the uploading of sibling projects is com
 
 For the installer, Dotnet 4.8 is required. It is the same version used by Quantower Algo project templates, so it is should be bundled with Quantower.
 
-For development tools, it currently requires either Quantower to be running or that the `QuantowerRoot` environment variable is set to Quantower folder with `Start.lnk`.
+For development tools, it currently requires either Quantower to be running or that the `QuantowerRoot` environment variable is set to the Quantower folder with `Start.lnk`.
