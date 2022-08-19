@@ -3,9 +3,9 @@ A project to help deploy indicator projects for the Quantower platform.
 
 ## Overview
 
-This project builds an installer system for Quantower Indicator Projects.
+This project builds an installer (`JollyWizard.Quantower.IndicatorDeploy.exe`) for Quantower Indicator Projects.
 
-As a dependency it enables build tasks:
+It also builds an, `MSBuild/nuget` project dependency, which enables build tasks to help with Quantower development:
 
 * Automatically detect running Quantower instances and include their assemblies as references.
   * This prevents hardcoding local paths into repository like Quantower Algo.
